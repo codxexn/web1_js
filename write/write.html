@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>document.write()사용</title>
+</head>
+<body></body>
+<script>
+  // document.write("<h3>안녕! 반가워😁</h3>");
+  // document.write(1 +1 + "번이야!😀");
+  // document.write("<span>자바스트립트!</span>");
+  // document.write("<span>좋아! 😂</span>");
+  with(document) {
+    write("<h3>안녕! 반가워😁</h3>");
+    write(1 +1 + "번이야!😀");
+    write("<span>자바스트립트!</span>");
+    write("<span>좋아! 😂</span>");
+  }
+</script>
+</html>
