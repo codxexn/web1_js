@@ -157,16 +157,16 @@ readme 파일에 목차 및 내용 정리해두었으니 참고 부탁드립니�
 <br><br>
 
 ## 📝 Paging
+
 > ### 필요한 파라미터
 
-<br> 
 
 > #### 게시물
 - rowCount: 한페이지에 보여줄 게시물 개수
 - offset: 한페이지에서 시작할 게시물 번호
 - limit: 한페이지에서 끝나야 할 게시물 번호 + 1
 
-<br> 
+
 
 > #### 페이지바
 - page: 현재 페이지
@@ -174,6 +174,68 @@ readme 파일에 목차 및 내용 정리해두었으니 참고 부탁드립니�
 - startPage: 게시물에 따라서 시작할 페이지 번호
 - endPage: 게시물에 따라서 끝날 페이지 번호
 - realEndPage: 가장 마지막 페이지
+
+<br>
+
+> ### 1. 한페이지에 뿌려줄 게시글 수 연산 코드
+
+
+📌 **한페이지당 보여질 게시글의 수도 변수로 선언해두면 나중에 유지/보수에 편하다.**
+```js
+const rowCount = 10;
+```
+- offset: 그 페이지에서 시작할 게시글 혹은 사진의 번호
+```js
+시작 ➡️ 현재페이지 -1 * rowCount (한페이지당 게시글 10개라는 가정)
+	예) 
+		1페이지 -1 = 0 * 10 하면 0이니까 시작점(게시글(혹은 사진) 번호 0부터 시작
+```
+- limit: 그 페이지에서 끝나야할 게시글 혹은 사진의 번호(exclusive라서 +1)
+```js
+제한 ➡️ offset + rowCount (한페이지당 게시글 10개라는 가정)
+	따라서 한페이지에 뿌려줄 photos 라는 Array 객체에
+	photos = photos.slice(offset, limit); 을 담아주면 알아서 자동 연산이 된다.
+		(시작 게시글(혹은 사진)부터 마지막 게시글(혹은 사진)까지 포함해서 잘라주는 메소드)
+```
+
+<br>
+
+> ### 2. 아래에 보여줄 페이지 버튼의 단위
+- 현재페이지 = page
+- 한번에 보여줄 페이지 단위= pageCount
+- startPage, endPage
+- 내림: Math.floor
+- 올림: Math.ceil
+```js
+startPage = Math.floor(page / pageCount) * pageCount + 1;
+[ 33페이지인데 31이 나오게 해야 하면  33/10  floor3.3(내림) * 10 +1 ]
+
+endPage = Math.ceil(page / pageCount) * pageCount;
+```
+
+<br>
+
+> ### 3. 불편한 사항
+> 실제로 마지막 페이지는 배수로 끝나지 않을 수도 있다.  
+> 실제 마지막 페이지를 구해줘야 한다.  
+> 전체 게시글 수에서 한 페이지당 보여줄 게시글 수를 나누면 총 몇 개의 페이지가 필요한지 나온다.
+```js
+예를 들면 5000개의 게시글을 10개씩 보여주면 총 500개의 페이지가 필요하다.
+따라서,
+
+const realEndPage = Math.ceil(photos.length / rowCount);
+[photos -> resolve 로 받아준 객체]
+
+✔️ 경우의 수 2가지
+➡️ endPage == realEndPage: 그냥 두면 됨
+➡️ endPage > realEndPage: realEndPage 이후에 뜨는 것을 없애줘야 함
+
+📌 endPage = endPage > realEndPage ?  realEndPage : endPage;
+따라서 endPage 는 달라질 수 있기 때문에 let 타입으로 선언해준다.
+```
+
+
+
 
 
 
