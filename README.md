@@ -153,6 +153,13 @@ readme 파일에 목차 및 내용 정리해두었으니 참고 부탁드립니�
 > #### DOM: Document Object Model
 - js로 html을 가지고 오면 DOM 이다.
 - 무조건 하나의 DOM Tree로 묶어주는 게 성능이 좋다.
+- [DOM] 없이는 fetch 로 가지고 온 정보를 화면에 뿌릴 수 없다.
+```js
+Document.getElementby
+Document.querySelector
+Document.innerHTML
+.. 등
+```
 
 <br><br>
 
@@ -219,32 +226,75 @@ endPage = Math.ceil(page / pageCount) * pageCount;
 > 실제로 마지막 페이지는 배수로 끝나지 않을 수도 있다.  
 > 실제 마지막 페이지를 구해줘야 한다.  
 > 전체 게시글 수에서 한 페이지당 보여줄 게시글 수를 나누면 총 몇 개의 페이지가 필요한지 나온다.
-```js
-예를 들면 5000개의 게시글을 10개씩 보여주면 총 500개의 페이지가 필요하다.
-따라서,
 
+예를 들면 5000개의 게시글을 10개씩 보여주면 총 500개의 페이지가 필요하다.  
+따라서,
+```js
 const realEndPage = Math.ceil(photos.length / rowCount);
 [photos -> resolve 로 받아준 객체]
-
-✔️ 경우의 수 2가지
-➡️ endPage == realEndPage: 그냥 두면 됨
+```
+✔️ 경우의 수 2가지  
+➡️ endPage == realEndPage: 그냥 두면 됨  
 ➡️ endPage > realEndPage: realEndPage 이후에 뜨는 것을 없애줘야 함
+```js
+endPage = endPage > realEndPage ?  realEndPage : endPage;
+```
+📌 따라서 endPage 는 달라질 수 있기 때문에 let 타입으로 선언해준다.
 
-📌 endPage = endPage > realEndPage ?  realEndPage : endPage;
-따라서 endPage 는 달라질 수 있기 때문에 let 타입으로 선언해준다.
+<br>
+
+> ### 4. 버그
+
+
+> 게시글이 0일 때
+```js
+	endPage = pageCount
+	realEndPage = 0
 ```
 
+이기 때문에 아래 페이지 버튼이 0으로 뜬다.  
+📌 따라서 그럴 때는 **if문을 써서 endPage를 1로** 바꿔준다. 
+
+<br>
+
+> ### 5. 페이징처리를 구현해야 클릭이벤트를 넣어줄 수 있다.  
+> #### div 를 paging 으로 만들어주고 JS에서 반복문 돌려서 페이지만큼 innerHTML로 append 하는 것!
+> #### Promise 객체로 게시글을 받은 후에 then 으로 받아서 그 게시글을 하나씩 돌리는 콜백함수 안에서 반복문 작업을 해준다.
+- 페이징 기본 구조
+- 이전, for문(버튼 뽑는 것), 다음 버튼 순
+```js
+if( ){ }
+for( ){ }
+if( ){ }
+```
+
+<br>
+
+> ### 6. css
+- clear: both ➡️ 양 옆에 아무것도 없게끔 하는 것, 다음 줄로 넘어간다.
+- text-decoration: none; ➡️ 밑줄 등 없애기
+- height 가 늘어나는 만큼 line - height도 늘려야 한다. 똑같이 해야 위 아래 가운데에 위치가 된다.
+
+<br>
 
 
-
-
-
-
-
-
-
-
-
+📌 js에서는 전체를 다 가지고 와서 화면에 원하는 개수만 뿌리는 구조라서 가지고 오는데 시간이 많이 걸린다.  
+📌 spring에서는 DB query를 이용해서 애초에 원하는 개수만큼만 가지고 오도록 할 수 있다.
+```oracle
+ <select id="selectCasesAndRepliesByLawyerId" resultType="lawyerReplyDTO">
+        SELECT P2.CONSULTING_CASE_ID, P2.MEMBER_ID, P2.CASE_TITLE, P2.CONSULTING_CASE_REPLY_ID, P2.LAWYER_ID, P2.CONSULTING_CASE_REPLY_CONTENT, P2.CREATE_DATE, P2.UPDATE_DATE
+        FROM
+            (SELECT ROWNUM R, P1.CONSULTING_CASE_ID, P1.MEMBER_ID, P1.CASE_TITLE, P1.CONSULTING_CASE_REPLY_ID, P1.LAWYER_ID, P1.CONSULTING_CASE_REPLY_CONTENT, P1.CREATE_DATE, P1.UPDATE_DATE
+            FROM
+                (SELECT CC.CONSULTING_CASE_ID, CC.MEMBER_ID, CC.CASE_TITLE, CCR.CONSULTING_CASE_REPLY_ID, CCR.LAWYER_ID, CCR.CONSULTING_CASE_REPLY_CONTENT, CCR.CREATE_DATE, CCR.UPDATE_DATE
+                FROM TBL_CONSULTING_CASE CC
+                JOIN TBL_CONSULTING_CASE_REPLY CCR
+                ON CC.CONSULTING_CASE_ID = CCR.CONSULTING_CASE_ID
+                WHERE CCR.LAWYER_ID = #{lawyerId}
+                ORDER BY CCR.CONSULTING_CASE_REPLY_ID DESC) P1 ) P2
+        WHERE P2.R IN (1, 2, 3)
+    </select>
+```
 
 
 
